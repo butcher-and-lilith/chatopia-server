@@ -9,3 +9,48 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id  String @id @default(uuid())
+  email String @unique
+  username String @unique
+  firstName String?
+  lastName String?
+  avatarUrl String?
+
+  joinedChannels Channel[] @relation("UserJoinedChannels")
+  messages Message[]
+
+  createdChannelId String?
+  createdChannel Channel?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model Channel {
+  id  String @id @default(uuid())
+  name String
+  description String?
+
+  members User[] @relation("UserJoinedChannels")
+  messages Message[]
+  
+  ownerId String @unique
+  owner User @relation(fields: [ownerId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model Message {
+  id String @id @default(uuid())
+  content String
+  timestamp DateTime @default(now())
+
+  userId String
+  user User @relation(fields: [userId], references: [id])
+
+  channelId String
+  channel Channel @relation(fields: [channelId], references: [id])
+}
