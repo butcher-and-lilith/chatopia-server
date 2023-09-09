@@ -17,6 +17,7 @@ model User {
   firstName String?
   lastName String?
   avatarUrl String?
+  status String?
   password String
 
   joinedChannels Channel[] @relation("UserJoinedChannels")
