@@ -13,7 +13,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly prismaService: PrismaService,
+    private prismaService: PrismaService,
     private jwtService: JwtService,
   ) {}
 
@@ -44,7 +44,7 @@ export class AuthService {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
           throw new ForbiddenException(
-            `The "${error.meta.target} is invalid or already taken`,
+            `The "${error.meta.target}" is invalid or already taken`,
           );
         }
       }
