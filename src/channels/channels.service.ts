@@ -39,6 +39,19 @@ export class ChannelsService {
     return channel;
   }
 
+  async create(userId: string, data) {
+    const newChannel = await this.prismaService.channel.create({
+      data: {
+        name: data.name,
+        description: data.description,
+        owner: { connect: { id: userId } },
+      },
+      include: { owner: true },
+    });
+
+    return newChannel;
+  }
+
   async update(id: string, data) {
     const channel = await this.prismaService.channel.findUnique({
       where: { id },
