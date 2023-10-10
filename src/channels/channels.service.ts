@@ -61,6 +61,8 @@ export class ChannelsService {
       throw new NotFoundException(`Channel with id: "${id}" does not exist`);
     }
 
+    // add validation for ownerId
+
     try {
       const updatedChannel = await this.prismaService.channel.update({
         where: { id },
@@ -122,5 +124,50 @@ export class ChannelsService {
     }
 
     return channel;
+  }
+
+  async chat(channelId: string, userId: string, content: string) {
+    const channel = await this.prismaService.channel.findUnique({
+      where: { id: channelId },
+    });
+
+    if (!channel) {
+      throw new NotFoundException(
+        `Channel with id: "${channelId}" does not exist`,
+      );
+    }
+
+    const user = await this.prismaService.user.findUnique({
+      where: { id: userId },
+      include: { joinedChannels: true },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User with id: "${userId}" does not exist`);
+    }
+
+    const isChannelAlreadyJoined = user.joinedChannels.some(
+      (channel) => channel.id === channelId,
+    );
+
+    if (!isChannelAlreadyJoined) {
+      throw new NotFoundException(
+        "You don't have permission to chat on this channel",
+      );
+    }
+
+    const chat = await this.prismaService.message.create({
+      data: {
+        content: content,
+        user: { connect: { id: userId } },
+        channel: { connect: { id: channelId } },
+      },
+      include: {
+        user: true,
+        channel: true,
+      },
+    });
+
+    return chat;
   }
 }
