@@ -12,19 +12,24 @@ export class ChannelsService {
   constructor(private prismaService: PrismaService) {}
 
   async findAll(query: string) {
-    const channels = await this.prismaService.channel.findMany({
-      where: {
-        OR: [
-          {
-            name: {
-              contains: query,
-              mode: 'insensitive',
+    if (query) {
+      const channels = await this.prismaService.channel.findMany({
+        where: {
+          OR: [
+            {
+              name: {
+                contains: query,
+                mode: 'insensitive',
+              },
             },
-          },
-        ],
-      },
-    });
-    return channels;
+          ],
+        },
+      });
+      return channels;
+    } else {
+      const channels = await this.prismaService.channel.findMany({});
+      return channels;
+    }
   }
 
   async findOne(id: string) {
@@ -119,7 +124,7 @@ export class ChannelsService {
       });
     } else {
       throw new ConflictException(
-        `Channel with id: ${channel} is already joined.`,
+        `Channel with id: "${channelId}" is already joined.`,
       );
     }
 

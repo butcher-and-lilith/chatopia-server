@@ -16,6 +16,7 @@ import {
   ApiBearerAuth,
   ApiOkResponse,
   ApiCreatedResponse,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { ChannelsService } from './channels.service';
 import { CreateChannelDto } from './dto/create-channel.dto';
@@ -31,6 +32,12 @@ export class ChannelsController {
   constructor(private channelsService: ChannelsService) {}
 
   @Get()
+  @ApiQuery({
+    name: 'q',
+    required: false,
+    type: String,
+    description: 'Search channels by name',
+  })
   @ApiOkResponse({ isArray: true })
   async findAll(@Query('q') query?: string) {
     const channels = await this.channelsService.findAll(query);
@@ -47,11 +54,9 @@ export class ChannelsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiCreatedResponse({})
-  async create(
-    @Param('id') id: string,
-    @Body() createChannelDto: CreateChannelDto,
-  ) {
-    return await this.channelsService.create(id, createChannelDto);
+  async create(@Request() req, @Body() createChannelDto: CreateChannelDto) {
+    const userId = req.user.id;
+    return await this.channelsService.create(userId, createChannelDto);
   }
 
   @Put(':id')

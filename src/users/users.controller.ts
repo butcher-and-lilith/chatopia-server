@@ -11,7 +11,12 @@ import {
   UseGuards,
 } from '@nestjs/common';
 
-import { ApiTags, ApiBearerAuth, ApiOkResponse } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiOkResponse,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserEntity } from './entities/user.entity';
@@ -23,6 +28,12 @@ export class UsersController {
   constructor(private usersService: UsersService) {}
 
   @Get()
+  @ApiQuery({
+    name: 'q',
+    required: false,
+    type: String,
+    description: 'Search users by name',
+  })
   @ApiOkResponse({ type: UserEntity, isArray: true })
   async findAll(@Query('q') query?: string) {
     const users = await this.usersService.findAll(query);

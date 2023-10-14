@@ -12,31 +12,37 @@ export class UsersService {
   constructor(private prismaService: PrismaService) {}
 
   async findAll(query: string) {
-    const users = await this.prismaService.user.findMany({
-      where: {
-        OR: [
-          {
-            username: {
-              contains: query,
-              mode: 'insensitive',
+    console.log('query', query);
+    if (query) {
+      const users = await this.prismaService.user.findMany({
+        where: {
+          OR: [
+            {
+              username: {
+                contains: query,
+                mode: 'insensitive',
+              },
             },
-          },
-          {
-            firstName: {
-              contains: query,
-              mode: 'insensitive',
+            {
+              firstName: {
+                contains: query,
+                mode: 'insensitive',
+              },
             },
-          },
-          {
-            lastName: {
-              contains: query,
-              mode: 'insensitive',
+            {
+              lastName: {
+                contains: query,
+                mode: 'insensitive',
+              },
             },
-          },
-        ],
-      },
-    });
-    return users;
+          ],
+        },
+      });
+      return users;
+    } else {
+      const users = await this.prismaService.user.findMany({});
+      return users;
+    }
   }
 
   async findOne(id: string) {
