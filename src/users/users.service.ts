@@ -12,7 +12,6 @@ export class UsersService {
   constructor(private prismaService: PrismaService) {}
 
   async findAll(query: string) {
-    console.log('query', query);
     if (query) {
       const users = await this.prismaService.user.findMany({
         where: {
