@@ -23,10 +23,10 @@ export class UserEntity {
   @ApiProperty()
   status: string;
 
-  @ApiProperty()
+  @Exclude()
   createdAt: Date;
 
-  @ApiProperty()
+  @Exclude()
   updatedAt: Date;
 
   @Exclude()
