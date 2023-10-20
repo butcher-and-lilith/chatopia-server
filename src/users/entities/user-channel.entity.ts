@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
 
-export class UserEntity {
+export class UserChannelEntity {
   @ApiProperty()
   id: string;
 
@@ -20,7 +20,7 @@ export class UserEntity {
   @ApiProperty()
   avatarUrl: string;
 
-  @ApiProperty()
+  @Exclude()
   status: string;
 
   @Exclude()
@@ -35,7 +35,7 @@ export class UserEntity {
   @Exclude()
   createdChannelId: string;
 
-  constructor(partial: Partial<UserEntity>) {
+  constructor(partial: Partial<UserChannelEntity>) {
     Object.assign(this, partial);
   }
 }

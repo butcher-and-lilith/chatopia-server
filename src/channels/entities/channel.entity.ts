@@ -1,5 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Exclude } from 'class-transformer';
+import { Exclude, Type } from 'class-transformer';
+import { UserChannelEntity } from 'src/users/entities/user-channel.entity';
+import { MessageEntity } from './message.entity';
 
 export class ChannelEntity {
   @ApiProperty()
@@ -12,13 +14,16 @@ export class ChannelEntity {
   description: string;
 
   @ApiProperty()
-  owner: User;
+  @Type(() => UserChannelEntity)
+  owner: UserChannelEntity;
 
   @ApiProperty()
-  members: User[];
+  @Type(() => UserChannelEntity)
+  members: UserChannelEntity[];
 
   @ApiProperty()
-  messages: Message[];
+  @Type(() => MessageEntity)
+  messages: MessageEntity[];
 
   @Exclude()
   createdAt: Date;
@@ -26,21 +31,16 @@ export class ChannelEntity {
   @Exclude()
   updatedAt: Date;
 
+  @Exclude()
+  ownerId: string;
+
   constructor(partial: Partial<ChannelEntity>) {
     Object.assign(this, partial);
   }
 }
 
 interface User {
-  userId: string;
-  username: string;
-  firstName?: string;
-  lastName?: string;
-  avatarUrl?: string;
+  password: string;
 }
 
-interface Message {
-  user: User;
-  content: string;
-  timestamp: Date;
-}
+type UserTest = Exclude<User, 'password'>;

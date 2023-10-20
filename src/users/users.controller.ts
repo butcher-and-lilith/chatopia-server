@@ -20,6 +20,7 @@ import {
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserEntity } from './entities/user.entity';
+import { UserPrivateEntity } from './entities/user-private.entity';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller('users')
@@ -41,16 +42,18 @@ export class UsersController {
   }
 
   @Get(':id')
-  @ApiOkResponse({ type: UserEntity })
+  @ApiOkResponse({ type: UserPrivateEntity })
   async findOne(@Param('id') id: string) {
-    return new UserEntity(await this.usersService.findOne(id));
+    return new UserPrivateEntity(await this.usersService.findOne(id));
   }
 
   @Put(':id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOkResponse({ type: UserEntity })
+  @ApiOkResponse({ type: UserPrivateEntity })
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return new UserEntity(await this.usersService.update(id, updateUserDto));
+    return new UserPrivateEntity(
+      await this.usersService.update(id, updateUserDto),
+    );
   }
 }

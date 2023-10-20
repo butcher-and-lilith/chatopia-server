@@ -35,6 +35,16 @@ export class ChannelsService {
   async findOne(id: string) {
     const channel = await this.prismaService.channel.findUnique({
       where: { id },
+      include: {
+        owner: true,
+        members: true,
+        messages: {
+          include: {
+            user: true,
+            channel: true,
+          },
+        },
+      },
     });
 
     if (!channel) {
@@ -50,8 +60,18 @@ export class ChannelsService {
         name: data.name,
         description: data.description,
         owner: { connect: { id: userId } },
+        members: { connect: { id: userId } },
       },
-      include: { owner: true },
+      include: {
+        owner: true,
+        members: true,
+        messages: {
+          include: {
+            user: true,
+            channel: true,
+          },
+        },
+      },
     });
 
     return newChannel;
@@ -131,7 +151,7 @@ export class ChannelsService {
     return channel;
   }
 
-  async chat(channelId: string, userId: string, content: string) {
+  async sendMessage(channelId: string, userId: string, content: string) {
     const channel = await this.prismaService.channel.findUnique({
       where: { id: channelId },
     });
@@ -157,11 +177,11 @@ export class ChannelsService {
 
     if (!isChannelAlreadyJoined) {
       throw new NotFoundException(
-        "You don't have permission to chat on this channel",
+        "You don't have permission to send message on this channel",
       );
     }
 
-    const chat = await this.prismaService.message.create({
+    const message = await this.prismaService.message.create({
       data: {
         content: content,
         user: { connect: { id: userId } },
@@ -173,6 +193,6 @@ export class ChannelsService {
       },
     });
 
-    return chat;
+    return message;
   }
 }

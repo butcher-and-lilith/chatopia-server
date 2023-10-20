@@ -22,9 +22,8 @@ import { ChannelsService } from './channels.service';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { UpdateChannelDto } from './dto/update-channel.dto';
 import { SendMessageDto } from './dto/send-message.dto';
-//import { UserEntity } from './entities/user.entity';
+import { ChannelEntity } from './entities/channel.entity';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { Send } from 'express';
 
 @Controller('channels')
 @ApiTags('channels')
@@ -38,58 +37,64 @@ export class ChannelsController {
     type: String,
     description: 'Search channels by name',
   })
-  @ApiOkResponse({ isArray: true })
+  @ApiOkResponse({ type: ChannelEntity, isArray: true })
   async findAll(@Query('q') query?: string) {
     const channels = await this.channelsService.findAll(query);
-    return channels;
+    return channels.map((channel) => new ChannelEntity(channel));
   }
 
   @Get(':id')
-  @ApiOkResponse({})
+  @ApiOkResponse({ type: ChannelEntity })
   async findOne(@Param('id') id: string) {
-    return await this.channelsService.findOne(id);
+    return new ChannelEntity(await this.channelsService.findOne(id));
   }
 
   @Post()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiCreatedResponse({})
+  @ApiCreatedResponse({ type: ChannelEntity })
   async create(@Request() req, @Body() createChannelDto: CreateChannelDto) {
     const userId = req.user.id;
-    return await this.channelsService.create(userId, createChannelDto);
+    return new ChannelEntity(
+      await this.channelsService.create(userId, createChannelDto),
+    );
   }
 
   @Put(':id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOkResponse({})
+  @ApiOkResponse({ type: ChannelEntity })
   async update(
     @Param('id') id: string,
     @Body() updateChannelDto: UpdateChannelDto,
   ) {
-    return await this.channelsService.update(id, updateChannelDto);
+    return new ChannelEntity(
+      await this.channelsService.update(id, updateChannelDto),
+    );
   }
 
   @Post(':id/join')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOkResponse({})
+  @ApiOkResponse({ type: ChannelEntity })
   async join(@Param('id') channelId: string, @Request() req) {
     const userId = req.user.id;
-    return await this.channelsService.join(channelId, userId);
+    return new ChannelEntity(
+      await this.channelsService.join(channelId, userId),
+    );
   }
 
-  @Post(':id/chat')
+  @Post(':id/message')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiCreatedResponse({})
+  @ApiCreatedResponse({ type: ChannelEntity })
   async chat(
     @Param('id') channelId: string,
     @Request() req,
     @Body() sendMessageDto: SendMessageDto,
   ) {
     const userId = req.user.id;
-    return await this.channelsService.chat(
+    return await this.channelsService.sendMessage(
       channelId,
       userId,
       sendMessageDto.content,
