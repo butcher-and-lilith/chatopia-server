@@ -84,11 +84,26 @@ export class ChannelsController {
     );
   }
 
-  @Post(':id/message')
+  @Get(':id/messages')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiCreatedResponse({ type: ChannelEntity })
-  async chat(
+  async findAllMessages(@Param('id') channelId: string, @Request() req) {
+    const userId = req.user.id;
+    // return await this.channelsService.sendMessage(
+    //   channelId,
+    //   userId,
+    //   sendMessageDto.content,
+    // );
+
+    // get all messages (rmv messages in get channel)
+  }
+
+  @Post(':id/messages/send')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiCreatedResponse({ type: ChannelEntity })
+  async sendMessage(
     @Param('id') channelId: string,
     @Request() req,
     @Body() sendMessageDto: SendMessageDto,
