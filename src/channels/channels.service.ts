@@ -77,20 +77,22 @@ export class ChannelsService {
     return newChannel;
   }
 
-  async update(id: string, data) {
+  async update(channelId: string, userId: string, data) {
     const channel = await this.prismaService.channel.findUnique({
-      where: { id },
+      where: { id: channelId },
     });
 
     if (!channel) {
-      throw new NotFoundException(`Channel with id: "${id}" does not exist`);
+      throw new NotFoundException(
+        `Channel with id: "${channelId}" does not exist`,
+      );
     }
 
     // add validation for ownerId
 
     try {
       const updatedChannel = await this.prismaService.channel.update({
-        where: { id },
+        where: { id: channelId },
         data: {
           name: data.name,
           description: data.description,
