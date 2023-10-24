@@ -88,7 +88,15 @@ export class ChannelsService {
       );
     }
 
-    // add validation for ownerId
+    const user = await this.prismaService.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (user.createdChannelId != channelId) {
+      throw new ForbiddenException(
+        "You don't have permission to update this channel",
+      );
+    }
 
     try {
       const updatedChannel = await this.prismaService.channel.update({
